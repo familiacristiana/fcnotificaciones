@@ -13,22 +13,33 @@ function requestNotificationPermission() {
     }
   });
 }
-
 function getToken() {
-    messaging.getToken({ vapidKey: 'BIkpTxJb81L2FoTFJxkA8nu2KTndfWXAo1jTW9fmIuUP5LfmdggLE86JUwGmu-GZOLs5gTUUoe8B_KH22vnUoFU' }).then((currentToken) => {
-      if (currentToken) {
-        console.log('Token del dispositivo:', currentToken);
-        sendTokenToServer(currentToken);
-      } else {
-        console.log('No se pudo obtener el token del dispositivo.');
-      }
-    }).catch((err) => {
-      console.log('Ocurrió un error al obtener el token:', err);
-      if (err.code === 'messaging/failed-service-worker-registration') {
-        console.log('Asegúrate de que el archivo firebase-messaging-sw.js existe en la raíz de tu proyecto.');
-      }
-    });
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then((registration) => {
+        console.log('Service Worker registrado con éxito:', registration);
+        return messaging.getToken({ vapidKey: 'BIkpTxJb81L2FoTFJxkA8nu2KTndfWXAo1jTW9fmIuUP5LfmdggLE86JUwGmu-GZOLs5gTUUoe8B_KH22vnUoFU' });
+      })
+      .then((currentToken) => {
+        if (currentToken) {
+          console.log('Token del dispositivo:', currentToken);
+          sendTokenToServer(currentToken);
+        } else {
+          console.log('No se pudo obtener el token del dispositivo.');
+        }
+      })
+      .catch((err) => {
+        console.log('Ocurrió un error al obtener el token:', err);
+        if (err.code === 'messaging/failed-service-worker-registration') {
+          console.log('Asegúrate de que el archivo firebase-messaging-sw.js existe en la raíz de tu proyecto.');
+        } else if (err.name === 'AbortError') {
+          console.log('AbortError: Failed to execute \'subscribe\' on \'PushManager\': Subscription failed - no active Service Worker');
+        }
+      });
+  } else {
+    console.log('Service Worker no es compatible con este navegador.');
   }
+}
 
   function sendTokenToServer(token) {
     
