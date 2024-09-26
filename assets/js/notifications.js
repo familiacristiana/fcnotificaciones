@@ -15,7 +15,7 @@ function requestNotificationPermission() {
 }
 function getToken() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    navigator.serviceWorker.register('https://familiacristiana.github.io/fcnotificaciones/firebase-messaging-sw.js')
       .then((registration) => {
         console.log('Service Worker registrado con éxito:', registration);
         return messaging.getToken({ vapidKey: 'BIkpTxJb81L2FoTFJxkA8nu2KTndfWXAo1jTW9fmIuUP5LfmdggLE86JUwGmu-GZOLs5gTUUoe8B_KH22vnUoFU' });
